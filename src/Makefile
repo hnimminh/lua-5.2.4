@@ -7,9 +7,10 @@
 PLAT= none
 
 CC= gcc
-CFLAGS= -O2 -Wall -DLUA_COMPAT_ALL $(SYSCFLAGS) $(MYCFLAGS)
+CFLAGS= -O2 -Wall -DLUA_COMPAT_ALL $(SYSCFLAGS) $(MYCFLAGS) -fPIC
 LDFLAGS= $(SYSLDFLAGS) $(MYLDFLAGS)
 LIBS= -lm $(SYSLIBS) $(MYLIBS)
+LUA_SHARED_OBJECT= liblua5.2.so
 
 AR= ar rcu
 RANLIB= ranlib
@@ -43,7 +44,7 @@ LUAC_T=	luac
 LUAC_O=	luac.o
 
 ALL_O= $(BASE_O) $(LUA_O) $(LUAC_O)
-ALL_T= $(LUA_A) $(LUA_T) $(LUAC_T)
+ALL_T= $(LUA_A) $(LUA_T) $(LUAC_T) $(LUA_SHARED_OBJECT)
 ALL_A= $(LUA_A)
 
 # Targets start here.
@@ -64,6 +65,9 @@ $(LUA_T): $(LUA_O) $(LUA_A)
 
 $(LUAC_T): $(LUAC_O) $(LUA_A)
 	$(CC) -o $@ $(LDFLAGS) $(LUAC_O) $(LUA_A) $(LIBS)
+
+$(LUA_SHARED_OBJECT): $(CORE_O) $(LIB_O)
+	$(CC) -o $@ -shared $?
 
 clean:
 	$(RM) $(ALL_T) $(ALL_O)
